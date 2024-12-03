@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+option go_package = "orderly/common/pb";
+
+service Account {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc GetNewTokens(GetNewTokensRequest) returns (GetNewTokensResponse);
+  rpc UpdateById(UpdateUserRequest) returns (UpdateUserResponse);
+}
+
+message PublicUserProfile {
+  int64 Id = 1;
+  int64 Email = 2;
+  string Name = 3;
+  string Role = 4;
+  optional int64 NumberCompletedOrders = 5;
+}
+
+message LoginRequest{
+  string Email = 1;
+  string Password = 2;
+}
+
+message LoginResponse{
+  string AccessToken = 1;
+  string RefreshToken = 2;
+  int64 Id = 3;
+}
+
+message RegisterRequest{
+  string Email = 1;
+  string Password = 2;
+  string Name = 3;
+}
+
+message RegisterResponse{
+  string AccessToken = 1;
+  string RefreshToken = 2;
+  int64 Id = 3;
+}
+
+message GetNewTokensRequest{
+  string refreshToken = 1;
+}
+
+message GetNewTokensResponse{
+  string accessToken = 1;
+  string refreshToken = 2;
+}
+
+message UpdateUserRequest{
+  int64 id = 1;
+  optional string Name = 2;
+  optional string Email = 3;
+  optional string Password = 4;
+  optional string NewPassword = 5;
+}
+message UpdateUserResponse {
+  bool isSuccess = 1;
+}
+message GetProfileRequest {
+  int64 Id = 1;
+}
+message GetProfileResponse {
+  PublicUserProfile Profile = 1;
+}
