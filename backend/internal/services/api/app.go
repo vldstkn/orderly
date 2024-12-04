@@ -6,25 +6,21 @@ import (
 	"net/http"
 	configs "orderly/internal/config"
 	api "orderly/internal/services/api/handlers"
-	"orderly/pkg/db"
 )
 
 type App struct {
 	Config *configs.Config
-	DB     *db.DB
 	Logger *slog.Logger
 }
 
 type AppDeps struct {
 	Config *configs.Config
-	DB     *db.DB
 	Logger *slog.Logger
 }
 
 func NewApp(deps *AppDeps) *App {
 	return &App{
 		Config: deps.Config,
-		DB:     deps.DB,
 		Logger: deps.Logger,
 	}
 }

@@ -43,6 +43,8 @@ message RegisterResponse{
 
 message GetNewTokensRequest{
   string refreshToken = 1;
+  int64 id = 2;
+  string role = 3;
 }
 
 message GetNewTokensResponse{

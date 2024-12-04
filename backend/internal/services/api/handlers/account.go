@@ -79,7 +79,24 @@ func (handler *Handler) Register() http.HandlerFunc {
 
 func (handler *Handler) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		body, err := req.HandleBody[api.LoginRequest](&w, r)
+		if err != nil {
+			handler.Logger.Error("req.HandleBody", slog.String("err", err.Error()))
+			return
+		}
+		response, err := handler.AccountClient.Login(context.Background(), &pb.LoginRequest{
+			Email:    body.Email,
+			Password: body.Password,
+		})
+		if err != nil {
+			http_error.BadRequest(w, handler.Logger, "AccountClient.Login", err)
+			return
+		}
+		handler.ApiService.AddCookie(&w, "refresh_token", response.RefreshToken, 3600)
+		res.Json(w, api.LoginResponse{
+			Id:          int(response.Id),
+			AccessToken: response.AccessToken,
+		}, http.StatusCreated)
 	}
 }
 
