@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Account_Register_FullMethodName     = "/Account/Register"
-	Account_Login_FullMethodName        = "/Account/Login"
-	Account_GetProfile_FullMethodName   = "/Account/GetProfile"
-	Account_GetNewTokens_FullMethodName = "/Account/GetNewTokens"
-	Account_UpdateById_FullMethodName   = "/Account/UpdateById"
+	Account_Register_FullMethodName       = "/Account/Register"
+	Account_Login_FullMethodName          = "/Account/Login"
+	Account_GetProfileById_FullMethodName = "/Account/GetProfileById"
+	Account_GetNewTokens_FullMethodName   = "/Account/GetNewTokens"
+	Account_UpdateById_FullMethodName     = "/Account/UpdateById"
+	Account_ChangeRole_FullMethodName     = "/Account/ChangeRole"
 )
 
 // AccountClient is the client API for Account service.
@@ -32,9 +33,10 @@ const (
 type AccountClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*GetProfileResponse, error)
+	GetProfileById(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*GetProfileResponse, error)
 	GetNewTokens(ctx context.Context, in *GetNewTokensRequest, opts ...grpc.CallOption) (*GetNewTokensResponse, error)
 	UpdateById(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	ChangeRole(ctx context.Context, in *ChangeRoleRequest, opts ...grpc.CallOption) (*ChangeRoleResponse, error)
 }
 
 type accountClient struct {
@@ -65,10 +67,10 @@ func (c *accountClient) Login(ctx context.Context, in *LoginRequest, opts ...grp
 	return out, nil
 }
 
-func (c *accountClient) GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*GetProfileResponse, error) {
+func (c *accountClient) GetProfileById(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*GetProfileResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetProfileResponse)
-	err := c.cc.Invoke(ctx, Account_GetProfile_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, Account_GetProfileById_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,15 +97,26 @@ func (c *accountClient) UpdateById(ctx context.Context, in *UpdateUserRequest, o
 	return out, nil
 }
 
+func (c *accountClient) ChangeRole(ctx context.Context, in *ChangeRoleRequest, opts ...grpc.CallOption) (*ChangeRoleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChangeRoleResponse)
+	err := c.cc.Invoke(ctx, Account_ChangeRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AccountServer is the server API for Account service.
 // All implementations must embed UnimplementedAccountServer
 // for forward compatibility.
 type AccountServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
-	GetProfile(context.Context, *GetProfileRequest) (*GetProfileResponse, error)
+	GetProfileById(context.Context, *GetProfileRequest) (*GetProfileResponse, error)
 	GetNewTokens(context.Context, *GetNewTokensRequest) (*GetNewTokensResponse, error)
 	UpdateById(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	ChangeRole(context.Context, *ChangeRoleRequest) (*ChangeRoleResponse, error)
 	mustEmbedUnimplementedAccountServer()
 }
 
@@ -120,14 +133,17 @@ func (UnimplementedAccountServer) Register(context.Context, *RegisterRequest) (*
 func (UnimplementedAccountServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAccountServer) GetProfile(context.Context, *GetProfileRequest) (*GetProfileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
+func (UnimplementedAccountServer) GetProfileById(context.Context, *GetProfileRequest) (*GetProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProfileById not implemented")
 }
 func (UnimplementedAccountServer) GetNewTokens(context.Context, *GetNewTokensRequest) (*GetNewTokensResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNewTokens not implemented")
 }
 func (UnimplementedAccountServer) UpdateById(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateById not implemented")
+}
+func (UnimplementedAccountServer) ChangeRole(context.Context, *ChangeRoleRequest) (*ChangeRoleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangeRole not implemented")
 }
 func (UnimplementedAccountServer) mustEmbedUnimplementedAccountServer() {}
 func (UnimplementedAccountServer) testEmbeddedByValue()                 {}
@@ -186,20 +202,20 @@ func _Account_Login_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Account_GetProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Account_GetProfileById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetProfileRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AccountServer).GetProfile(ctx, in)
+		return srv.(AccountServer).GetProfileById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Account_GetProfile_FullMethodName,
+		FullMethod: Account_GetProfileById_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServer).GetProfile(ctx, req.(*GetProfileRequest))
+		return srv.(AccountServer).GetProfileById(ctx, req.(*GetProfileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -240,6 +256,24 @@ func _Account_UpdateById_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Account_ChangeRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServer).ChangeRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Account_ChangeRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServer).ChangeRole(ctx, req.(*ChangeRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Account_ServiceDesc is the grpc.ServiceDesc for Account service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -256,8 +290,8 @@ var Account_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Account_Login_Handler,
 		},
 		{
-			MethodName: "GetProfile",
-			Handler:    _Account_GetProfile_Handler,
+			MethodName: "GetProfileById",
+			Handler:    _Account_GetProfileById_Handler,
 		},
 		{
 			MethodName: "GetNewTokens",
@@ -266,6 +300,10 @@ var Account_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateById",
 			Handler:    _Account_UpdateById_Handler,
+		},
+		{
+			MethodName: "ChangeRole",
+			Handler:    _Account_ChangeRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -35,8 +35,16 @@ func (app *App) Run() {
 	if err != nil {
 		panic(err)
 	}
+	repository := NewRepository(&RepositoryDeps{
+		DB: app.DB,
+	})
+	service := NewService(&ServiceDeps{
+		Repository: repository,
+	})
 	handler := NewHandler(&HandlerDeps{
-		Config: app.Config,
+		Config:  app.Config,
+		Service: service,
+		Logger:  app.Logger,
 	})
 	server := grpc.NewServer(opts...)
 	pb.RegisterAccountServer(server, handler)

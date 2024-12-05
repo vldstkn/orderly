@@ -3,8 +3,10 @@ package account
 import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"orderly/internal/di"
 	"orderly/internal/domain"
+	api "orderly/internal/services/api/dto"
 	"orderly/pkg/jwt"
 	"time"
 )
@@ -32,16 +34,14 @@ func (service *Service) Register(email, password, name string) (int, error) {
 		return -1, errors.New("password hashing error")
 	}
 	user := &domain.User{
-		Role:     "Customer",
+		Role:     string(domain.Customer),
 		Password: string(hashPassword),
 		Name:     name,
 		Email:    email,
 	}
 	id, err := service.Repository.Create(user)
-	if err != nil {
-		return -1, nil
-	}
-	return id, nil
+
+	return id, err
 }
 
 func (service *Service) Login(email, password string) (int, string, error) {
@@ -50,10 +50,25 @@ func (service *Service) Login(email, password string) (int, string, error) {
 		return -1, "", errors.New("invalid email or password")
 	}
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err == nil {
+	if err != nil {
 		return -1, "", errors.New("invalid email or password")
 	}
 	return user.Id, user.Role, nil
+}
+
+func (service *Service) GetProfileById(id int) (*api.GetProfileResponse, error) {
+	user := service.Repository.FindById(id)
+	if user == nil {
+		return nil, errors.New("the user does not exist")
+	}
+	return &api.GetProfileResponse{
+		Id:        user.Id,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Email:     user.Email,
+		Name:      user.Name,
+		Role:      user.Role,
+	}, nil
 }
 
 func (service *Service) IssueTokens(secret string, data jwt.Data) (string, string, error) {
@@ -67,5 +82,22 @@ func (service *Service) IssueTokens(secret string, data jwt.Data) (string, strin
 		return "", "", err
 	}
 	return accessToken, refreshToken, nil
-	return "", "", nil
+}
+
+func (service *Service) ChangeRole(id int, role string) error {
+	isValid := isValidRole(role)
+	if !isValid {
+		return errors.New(http.StatusText(http.StatusBadRequest))
+	}
+	err := service.Repository.ChangeRoleById(id, role)
+	return err
+}
+
+func isValidRole(role string) bool {
+	switch domain.UserRole(role) {
+	case domain.Customer, domain.Provider:
+		return true
+	default:
+		return false
+	}
 }

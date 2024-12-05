@@ -5,17 +5,33 @@ option go_package = "orderly/common/pb";
 service Account {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
-  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc GetProfileById(GetProfileRequest) returns (GetProfileResponse);
   rpc GetNewTokens(GetNewTokensRequest) returns (GetNewTokensResponse);
   rpc UpdateById(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc ChangeRole(ChangeRoleRequest) returns (ChangeRoleResponse);
 }
+
+message ChangeRoleRequest{
+  int64 id = 1;
+  string Role = 2;
+}
+
+message ChangeRoleResponse{
+  int64 id = 1;
+  string Role = 2;
+  string AccessToken = 3;
+  string RefreshToken = 4;
+}
+
 
 message PublicUserProfile {
   int64 Id = 1;
-  int64 Email = 2;
-  string Name = 3;
-  string Role = 4;
-  optional int64 NumberCompletedOrders = 5;
+  string CreatedAt = 2;
+  string UpdatedAt = 3;
+  string Email = 4;
+  string Name = 5;
+  string Role = 6;
+  optional int64 NumberCompletedOrders = 7;
 }
 
 message LoginRequest{

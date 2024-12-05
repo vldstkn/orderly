@@ -1,5 +1,13 @@
 package domain
 
+type UserRole string
+
+const (
+	Customer UserRole = "customer"
+	Provider UserRole = "provider"
+	Admin    UserRole = "admin"
+)
+
 type User struct {
 	Id        int    `json:"id" db:"id"`
 	CreatedAt string `json:"createdAt" db:"created_at"`

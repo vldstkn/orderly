@@ -25,16 +25,17 @@ func (repo *Repository) FindById(id int) *domain.User {
 	if err != nil {
 		return nil
 	}
-	return nil
+	return &user
 }
 
 func (repo *Repository) FindByEmail(email string) *domain.User {
 	var user domain.User
 	err := repo.DB.Get(&user, `SELECT * FROM users WHERE email=$1`, email)
+
 	if err != nil {
 		return nil
 	}
-	return nil
+	return &user
 }
 
 func (repo *Repository) Create(user *domain.User) (int, error) {
@@ -45,4 +46,9 @@ func (repo *Repository) Create(user *domain.User) (int, error) {
 		return -1, err
 	}
 	return id, nil
+}
+
+func (repo *Repository) ChangeRoleById(id int, role string) error {
+	_, err := repo.DB.Exec(`UPDATE users SET role = $1 WHERE id = $2`, role, id)
+	return err
 }
